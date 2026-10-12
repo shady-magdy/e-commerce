@@ -1,0 +1,26 @@
+'use strict';
+
+const express = require('express');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
+const upload = require('../middleware/upload');
+const { asyncHandler } = require('../middleware/errors');
+const admin = require('../controllers/adminController');
+const products = require('../controllers/adminProductController');
+const importer = require('../controllers/importController');
+const orders = require('../controllers/adminOrderController');
+const accounts = require('../controllers/adminAccountController');
+const router = express.Router();
+router.use(requireAuth, requireAdmin);
+router.get('/dashboard', admin.dashboard);
+router.get('/products', products.listAdminProducts);
+router.post('/products', products.createProduct);
+router.put('/products/:id', products.updateProduct);
+router.delete('/products/:id', products.deleteProduct);
+router.get('/products/template.xlsx', importer.template);
+router.post('/products/import', upload.single('file'), upload.validateXlsxSignature, importer.importProducts);
+router.get('/orders', orders.listOrders);
+router.patch('/orders/:id/status', orders.updateOrderStatus);
+router.get('/accounts', accounts.listAccounts);
+router.get('/accounts/:id/orders', accounts.getAccountOrders);
+router.patch('/accounts/:id/status', accounts.setAccountActive);
+module.exports = router;
